@@ -6,6 +6,7 @@
 package tarea1;
 
 import java.io.*;
+import java.util.ArrayList;
 
 /**
  *
@@ -13,91 +14,94 @@ import java.io.*;
  */
 public class Tarea1 {
 
-    private static int nMin = 1;
-    private static int nMax = 11;
-    private static String[] a1 = {"1", "0", "a", "b", "c"};
-    private static String[] a2 = new String[0];//alfabeto vacio
-    private static String[] l = {"11", "00", "ab", "aabbcc"};
-    private static String[] lAux = new String[0];
+    private byte nMin = 0;
+    private byte nMax = 3;
 
-    public static void main(String[] args) {
+    public Tarea1(byte nMax) {
+        this.nMax = nMax;
+    }
+
+    public void GeneraString2() {
+        // Declaración el ArrayList
+
+        ArrayList<String> LENGUAJE = new ArrayList<String>();
+        ArrayList<String> Secundario = new ArrayList<String>();
+        ArrayList<String> Auxiliar = new ArrayList<String>();
+        LENGUAJE.add("11");
+        LENGUAJE.add("00");
+        LENGUAJE.add("ab");
+        LENGUAJE.add("aabbccc");
+        Auxiliar = LENGUAJE;
         FileWriter fichero = null;
         PrintWriter pw = null;
         try {
-            fichero = new FileWriter("e:/prueba.txt");
+            fichero = new FileWriter("prueba.txt");
             pw = new PrintWriter(fichero);
-            for (int i = nMin; i <= nMax; i++) {
-                int size = i == 1 ? l.length : (lAux.length * lAux.length);
-                String[] arr = lAux;
-                lAux = new String[size];
-                System.out.println(" loop:" + i + " size: " + size);
-                String[] arreglo2 = i == 1 ? l : arr;
-                int contador = 0;
-                for (int a = 0; a < arreglo2.length; a++) {
-                    if (i == 1) {
-                        lAux[a] = l[a];
-                        pw.println(lAux[a]);
-                       // System.out.println("valor: " + lAux[a]);
-                    } else {
-                        for (int L = 0; L < arreglo2.length; L++) {
-                            lAux[contador] = arreglo2[a].concat(arreglo2[L]);//i<=1?l[a].concat(a1[L]): arr[contador].concat(a1[L]);
-                           // System.out.println("valor " + contador + ": " + lAux[contador]);
-                            pw.println(lAux[contador]);
-                            contador++;
+            for (byte i = nMin; i <= nMax; i++) {
+                StringBuilder salida = new StringBuilder();
+                if (i < 1) {
+                    pw.print("L" + i + "={VACIO}\n");
+                } else {
+                    for (String aux : Auxiliar) {
+                        salida.append(aux + ",");
+                        for (String len : LENGUAJE) {
+                            Secundario.add(aux + len);
                         }
                     }
+                    pw.print("L" + i + "={"+salida.substring(0, salida.length()-1)+"}\n");
+                    Auxiliar = Copy(Secundario);
+                    Secundario.clear();
                 }
+                System.out.print("\n >>> " + i + "\n");
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("ERROR Tarea1.escribir() " + e.getMessage());
         } finally {
             try {
                 if (null != fichero) {
                     fichero.close();
                 }
             } catch (Exception e2) {
-                e2.printStackTrace();
+                System.err.println("ERROR Tarea1.escribir() finaly " + e2.getMessage());
             }
         }
+    }
 
-        /*FileWriter fichero = null;
-         PrintWriter pw = null;
-         try {
-         fichero = new FileWriter("e:/prueba.txt");
-         pw = new PrintWriter(fichero);
-         for (int i = nMin; i <= nMax; i++) {
-         //System.out.println("Pasada -> " + i);
-         //tamaño de arreglo si L^2 = lenguaje*alfabeto si L^n donde n >2 entonces auxuliar * alfabeto
-         int size = i == 1 ? l.length : i == 2 ? (a1.length * l.length) : (lAux.length * a1.length);
-         String[] arr = lAux;
-         lAux = new String[size];
-         String[] arreglo2 = i == 1 ? l : arr;
-         int contador = 0;
-         for (int a = 0; a < arreglo2.length; a++) {
-         if (i == 1) {
-         lAux[a] = l[a];
-         //System.out.println("valor: " + lAux[a]);
-         pw.println(lAux[a]);
-         } else {
-         for (int L = 0; L < a1.length; L++) {
-         lAux[contador] = arreglo2[a].concat(a1[L]);//i<=1?l[a].concat(a1[L]): arr[contador].concat(a1[L]);
-         //System.out.println("valor: " + lAux[contador]);
-         pw.println(lAux[contador]);
-         contador++;
-         }
-         }
-         }
-         }
-         } catch (Exception e) {
-         e.printStackTrace();
-         } finally {
-         try {
-         if (null != fichero) {
-         fichero.close();
-         }
-         } catch (Exception e2) {
-         e2.printStackTrace();
-         }
-         }*/
+    public ArrayList<String> Copy(ArrayList<String> entrada) {
+        ArrayList<String> salida = new ArrayList<String>();
+        for (String in : entrada) {
+            salida.add(in);
+        }
+        entrada.clear();
+        return salida;
+    }
+
+    public String leerArchivo() {
+        File archivo = null;
+        FileReader fr = null;
+        BufferedReader br = null;
+        String salida = "";
+        try {
+            archivo = new File("prueba.txt");
+            fr = new FileReader(archivo);
+            br = new BufferedReader(fr);
+
+            String linea;
+            while ((linea = br.readLine()) != null) {
+                salida += linea;
+            }
+            return salida;
+        } catch (IOException e) {
+            System.err.println("ERROR escribir " + e.getMessage());
+            return salida;
+        } finally {
+            try {
+                if (null != fr) {
+                    fr.close();
+                }
+            } catch (IOException e2) {
+                System.err.println("ERROR escribir.fr.close() " + e2.getMessage());
+            }
+        }
     }
 }
